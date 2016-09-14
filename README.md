@@ -1,8 +1,8 @@
 # move-literals - Move string literals
 
-Maybe you're writing a reverse engineering challenge, and you want to obfuscate your code. Maybe you're stuck with a huge legacy codebase in dire need of refactoring. You want to perform a set of operations on source code, but doing it manually is iterative, time consuming and boring. Your IDE isn't as helpful as you would want it to be. Maybe you try using awk or sed and regular expressions, but after a while you realize you need to take a step up in the Chomsky hierarchy.
+Maybe you're writing a reverse engineering challenge, and you want to obfuscate your code. Maybe you're stuck with a huge legacy codebase in dire need of refactoring. You want to perform a set of operations on source code, but doing it manually is iterative, time consuming and boring. Your IDE isn't as helpful as you would want it to be. Maybe you try using awk or sed and regular expressions, but after a while you realize you need to take a step up in the [Chomsky hierarchy](https://en.wikipedia.org/wiki/Chomsky_hierarchy).
 
-Enter Parsing Expression Grammars and LPeg.
+Enter [Parsing Expression Grammars](https://en.wikipedia.org/wiki/Parsing_expression_grammar) and [LPeg](http://www.inf.puc-rio.br/~roberto/lpeg/).
 
 It's fast, it's elegant, it makes you never want to think about regular expressions ever again.
 
@@ -10,7 +10,7 @@ This repo contains an example of how PEGs can be used. The example finds all str
 
 # dependencies
 
-Lua (probably/maybe > 5.1)
+[Lua](http://lua.org/) (probably/maybe > 5.1)
 LPeg
 
 # example
