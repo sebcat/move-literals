@@ -17,7 +17,7 @@ LPeg
 
 # example
 
-````
+```c
 $ cat example.c
 #include <stdio.h>
 
@@ -53,6 +53,6 @@ int main(int argc, char *argv[]) {
   printf(STRSYM__S_N, x);
   return 42;
 }
-````
+```
 
 
