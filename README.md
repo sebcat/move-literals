@@ -15,8 +15,11 @@ LPeg
 
 ## example
 
-````
+````bash
 $ cat example.c
+````
+
+````C
 #include <stdio.h>
 
 #ifdef __FOO_PLATFORM
@@ -31,9 +34,14 @@ int main(int argc, char *argv[]) {
   return 42;
 }
 
+````
 
+````bash
 $ ./move-literals.lua example.c > result.c
 $ cat result.c
+````
+
+````C
 #define STRSYM_FOOBARBAZ \
    "foobarbaz"
 #define STRSYM__S_N \
