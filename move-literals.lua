@@ -17,7 +17,7 @@ SYMPREFIX = "STRSYM_"
 function build_parser(syms)
   local P  = lpeg.P    -- literal pattern, matches a string
   local V  = lpeg.V    -- non-terminal, references a grammar rule
-  local S  = lpeg.S    -- set, matches a set of characters
+  local S  = lpeg.S    -- set, matches a set of bytes
   local B  = lpeg.B    -- look-behind
   local C  = lpeg.C    -- capture, captures the match of its argument pattern
   local Cs = lpeg.Cs   -- capture substitution
@@ -40,13 +40,14 @@ function build_parser(syms)
   -- files are huge.
   return P{
     "code";
-    lit_esc  = P"\\"*P(1),   -- matches a \ followed by any byte
+    lit_esc  = P"\\"*1,      -- matches a \ followed by any byte
     lit_cont = 1-S"\n\r\"",  -- matches any byte not in the given set
 
-    -- matches lit_esc, or if lit_esc doesn't match, matches lit_count,
-    -- zero or more times and substitutes the match for the value returned by
-    -- the cap function
-    in_lit   = Cs(((V"lit_esc" + V"lit_cont")^0)/cap),
+    -- matches lit_esc, or if lit_esc doesn't match, matches lit_cont,
+    -- zero or more times. The matched string is passed to cap using the
+    -- function capture operator '/', which produces a capture that
+    -- will be added to the table in the code rule below
+    in_lit   = ((V"lit_esc" + V"lit_cont")^0)/cap,
 
     -- matches " followed by the in_lit rule, followed by "
     literal  = P"\"" * V"in_lit" * P"\"",
@@ -66,7 +67,7 @@ function build_parser(syms)
     -- matches the rule for macro directives followed by zero or more
     -- bytes where the endmacro rule does not match, followed by the endmacro
     -- rule
-    macro    = V"macrodir"* (1-V"endmacro")^0 * V"endmacro",
+    macro    = V"macrodir" * (1-V"endmacro")^0 * V"endmacro",
 
     -- matches C single line comments; // followed by zero or more bytes where
     -- the newline rule does not match, followed by the newline rule
@@ -87,7 +88,7 @@ function build_parser(syms)
                     + V"literal"
 
                     -- or matches and captures any byte
-                    + C(P(1))
+                    + C(1)
 
                   -- zero or more times
                   )^0
