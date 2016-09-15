@@ -15,13 +15,13 @@ MINLEN = 4
 SYMPREFIX = "STRSYM_"
 
 function build_parser(syms)
-  local P  = lpeg.P
-  local V  = lpeg.V
-  local S  = lpeg.S
-  local B  = lpeg.B
-  local C  = lpeg.C
-  local Cs = lpeg.Cs
-  local Ct = lpeg.Ct
+  local P  = lpeg.P    -- literal pattern, matches a string
+  local V  = lpeg.V    -- non-terminal, references a grammar rule
+  local S  = lpeg.S    -- set, matches a set of characters
+  local B  = lpeg.B    -- look-behind
+  local C  = lpeg.C    -- capture, captures the match of its argument pattern
+  local Cs = lpeg.Cs   -- capture substitution
+  local Ct = lpeg.Ct   -- table capture, creates a table of its captures
 
   local function cap(str)
     if #str >= MINLEN then
@@ -40,17 +40,58 @@ function build_parser(syms)
   -- files are huge.
   return P{
     "code";
-    literal  = P"\"" * Cs((((P"\\"*P(1)) + (1-S"\n\r\""))^0)/cap) * P"\"",
+    lit_esc  = P"\\"*P(1),   -- matches a \ followed by any byte
+    lit_cont = 1-S"\n\r\"",  -- matches any byte not in the given set
+
+    -- matches lit_esc, or if lit_esc doesn't match, matches lit_count,
+    -- zero or more times and substitutes the match for the value returned by
+    -- the cap function
+    in_lit   = Cs(((V"lit_esc" + V"lit_cont")^0)/cap),
+
+    -- matches " followed by the in_lit rule, followed by "
+    literal  = P"\"" * V"in_lit" * P"\"",
+
+    -- matches (\r at most 1 time followed by \n), or end of data
     newline  = (P"\r"^-1 * P"\n") + -1,
+
+    -- matches the newline rule if it is preceded by something that's not
+    -- a backslash
     endmacro = -B"\\" * V"newline",
+
+    -- matches the literal patterns for macro directives
     macrodir = P"#define" + P"#error" + P"#warning" + P"#undef" + P"#ifdef" +
                P"#ifndef" + P"#if" + P"#else" + P"#elif" + P"#endif" +
                P"#pragma",
+
+    -- matches the rule for macro directives followed by zero or more
+    -- bytes where the endmacro rule does not match, followed by the endmacro
+    -- rule
     macro    = V"macrodir"* (1-V"endmacro")^0 * V"endmacro",
+
+    -- matches C single line comments; // followed by zero or more bytes where
+    -- the newline rule does not match, followed by the newline rule
     scomment = P"//" * (1-V"newline")^0 * V"newline",
+
+    -- matches C multi line comments; see the scomment rule
     mcomment = P"/*" * (1-P"*/")^0 * P"*/",
-    code     = Ct((C(V"mcomment" + V"scomment" + V"macro") + V"literal" +
-               C(P(1)))^0),
+
+    code     = Ct( -- takes all captures from the pattern below and puts
+                   -- them in a table
+                  (
+                    -- matches the mcomment rule, or the scomment rule, or
+                    -- the macro rule and takes the result
+                    C(V"mcomment" + V"scomment" + V"macro")
+
+                    -- or matches the literal rule, where the capture is
+                    -- produced in the in_lit rule
+                    + V"literal"
+
+                    -- or matches and captures any byte
+                    + C(P(1))
+
+                  -- zero or more times
+                  )^0
+                 ),
   }
 end
 
