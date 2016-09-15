@@ -97,11 +97,8 @@ function build_parser(syms)
 end
 
 function load_data(file)
-  f, err = io.open(file, "rb")
-  if err ~= nil then
-    error(err)
-  end
-  data = f:read("*a")
+  local f = assert(io.open(file, "rb"))
+  local data = f:read("*a")
   f:close()
   if data == nil then
     error("error reading data")
