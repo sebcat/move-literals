@@ -8,6 +8,8 @@ It's fast, it's elegant, it makes you never want to think about regular expressi
 
 This repo contains an example of how PEGs can be used. The example finds all string literals in a context where they would be compiled, and replaces them with preprocessor definitions. Why? Well, sometimes you just want to move all your strings around. You don't have to move them, you could just as easy replace them with a rot13, base64 encoded version and force push it to your company's master branch. Try it out!
 
+For a more verbose, commented version, see the [commented_expressions](https://github.com/sebcat/move-literals/tree/commented_expressions) branch
+
 # dependencies
 
 [Lua](http://lua.org/) (probably/maybe > 5.1)
