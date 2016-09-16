@@ -96,24 +96,19 @@ function build_parser(syms)
   }
 end
 
-function load_data(file)
-  local f = assert(io.open(file, "rb"))
-  local data = f:read("*a")
-  f:close()
-  if data == nil then
-    error("error reading data")
-  end
-  return data
+-- NB: if no argument is given, the default is to read from stdin until EOF
+if #arg == 1 then
+  io.input(arg[1])
+elseif #arg > 1 then
+  error("too many arguments")
 end
 
-if arg[1] == nil then
-  error("usage: move-literals.lua <in-file>")
-end
+local data = io.read("*a")
+if data == nil then error("error reading input data") end
 
-local data = load_data(arg[1])
 local syms = {}
 local p = build_parser(syms)
-res = p:match(data)
+local res = p:match(data)
 for label, str in pairs(syms) do
   io.write(string.format("#define %s \\\n   \"%s\"\n", label, str))
 end
