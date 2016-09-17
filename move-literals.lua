@@ -62,7 +62,7 @@ function build_parser(syms)
     -- matches the literal patterns for macro directives
     macrodir = P"#define" + P"#error" + P"#warning" + P"#undef" + P"#ifdef" +
                P"#ifndef" + P"#if" + P"#else" + P"#elif" + P"#endif" +
-               P"#pragma",
+               P"#pragma" + P"#include",
 
     -- matches the rule for macro directives followed by zero or more
     -- bytes where the endmacro rule does not match, followed by the endmacro
